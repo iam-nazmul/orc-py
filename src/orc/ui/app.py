@@ -130,9 +130,9 @@ class OrcApp(App):
     # -----------------------------------------------------------------------
 
     def _start_event_loops(self) -> None:
-        self.run_worker(self._orc_event_loop(), exclusive=False, name="orc-events")
-        self.run_worker(self._worker_event_loop(), exclusive=False, name="worker-events")
-        self.run_worker(self._state_loop(), exclusive=False, name="state-loop")
+        self._orc_event_loop()
+        self._worker_event_loop()
+        self._state_loop()
 
     @work(exclusive=False)
     async def _orc_event_loop(self) -> None:
@@ -260,9 +260,6 @@ class OrcApp(App):
 
     def _log_orc(self, kind: str, text: str) -> None:
         self.event_logs[ORC_SESSION_ID].append((kind, text))
-        asyncio.create_task(
-            self.state_manager.append_event(ORC_SESSION_ID, kind, text)
-        )
         panel = self.query_one(f"#panel-{ORC_SESSION_ID}", OrcPanel)
         panel.append_log(kind, text)
 
@@ -372,7 +369,7 @@ class OrcApp(App):
         tid = self._tab_ids[self._active_tab] if self._tab_ids else ORC_SESSION_ID
         label = "orc" if tid == ORC_SESSION_ID else f"worker {tid[:8]}"
         result = await self.push_screen_wait(
-            ComposeModal(label=label), wait_for_dismiss=True
+            ComposeModal(label=label)
         )
         if result:
             await self._send_message(tid, result)
@@ -395,7 +392,6 @@ class OrcApp(App):
     async def _show_question(self, pq: PendingQuestion) -> None:
         result = await self.push_screen_wait(
             QuestionModal(question=pq.question, context=pq.context),
-            wait_for_dismiss=True,
         )
         answer = result or ""
         await self.state_manager.answer_question(pq.id, answer, answered_by="user")
@@ -426,7 +422,6 @@ class OrcApp(App):
             return
         confirmed = await self.push_screen_wait(
             ConfirmModal(message=f"Kill worker {tid[:8]}?"),
-            wait_for_dismiss=True,
         )
         if not confirmed:
             return
@@ -512,7 +507,7 @@ class OrcApp(App):
         rev = self.reviews[tid]
 
         result = await self.push_screen_wait(
-            ReviewModal(review=rev), wait_for_dismiss=True
+            ReviewModal(review=rev)
         )
         if result:
             verdict, feedback = result
@@ -533,11 +528,8 @@ class OrcApp(App):
 
     async def action_scratch_claude(self) -> None:
         from ..worker import claude_bin
-        self.suspend()
-        try:
+        with self.suspend():
             subprocess.run([claude_bin()], cwd=str(self.project_dir))
-        finally:
-            self.resume()
 
     # -----------------------------------------------------------------------
     # Backchannel overlay (?)
@@ -550,12 +542,16 @@ class OrcApp(App):
             return
 
         if self.backchannel is None:
-            self.backchannel = await spawn_backchannel(
-                self.project_dir,
-                model="sonnet",
-                events_q=self.backchannel_q,
-            )
-            self.run_worker(self._backchannel_event_loop(), exclusive=False)
+            try:
+                self.backchannel = await spawn_backchannel(
+                    self.project_dir,
+                    model="sonnet",
+                    events_q=self.backchannel_q,
+                )
+            except Exception as e:
+                self.notify(f"Could not start backchannel: {e}", severity="error")
+                return
+            self._backchannel_event_loop()
 
         overlay = BackchannelOverlay(
             channel=self.backchannel,
@@ -588,7 +584,7 @@ class OrcApp(App):
 
     async def action_quit_confirm(self) -> None:
         confirmed = await self.push_screen_wait(
-            ConfirmModal(message="Quit orc?"), wait_for_dismiss=True
+            ConfirmModal(message="Quit orc?")
         )
         if confirmed:
             await self._cleanup()
