@@ -1,0 +1,223 @@
+/* OrcApp global stylesheet */
+
+Screen {
+    background: $surface;
+}
+
+#tab-strip {
+    height: 1;
+    background: $panel;
+    color: $text-muted;
+    dock: top;
+}
+
+.tab-item {
+    padding: 0 2;
+}
+
+.tab-item.active {
+    color: $text;
+    background: $primary;
+}
+
+.tab-badge {
+    color: $warning;
+}
+
+SessionPanel, OrcPanel {
+    height: 1fr;
+    overflow: hidden;
+}
+
+.panel-header {
+    height: 3;
+    background: $panel;
+    border-bottom: solid $primary-darken-2;
+    padding: 0 1;
+    color: $text-muted;
+}
+
+.panel-header .session-name {
+    color: $text;
+    text-style: bold;
+}
+
+.panel-header .session-state {
+    color: $accent;
+}
+
+.event-log {
+    height: 1fr;
+    overflow-y: scroll;
+    padding: 0 1;
+}
+
+.log-entry {
+    padding: 0;
+    color: $text;
+}
+
+.log-entry.text {
+    color: $text;
+}
+
+.log-entry.tool_use {
+    color: $text-muted;
+    text-style: italic;
+}
+
+.log-entry.tool_result {
+    color: $text-muted;
+    text-style: italic;
+}
+
+.log-entry.thinking {
+    color: $text-muted;
+    text-style: dim;
+}
+
+.log-entry.user {
+    color: $accent;
+}
+
+.log-entry.system {
+    color: $warning;
+    text-style: dim;
+}
+
+.log-entry.result {
+    color: $success;
+    text-style: dim;
+}
+
+/* Modals */
+
+ComposeModal {
+    align: center middle;
+}
+
+.compose-dialog {
+    width: 80;
+    max-height: 20;
+    background: $surface;
+    border: solid $primary;
+    padding: 1 2;
+}
+
+.modal-title {
+    color: $primary;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+QuestionModal {
+    align: center middle;
+}
+
+.question-dialog {
+    width: 80;
+    max-height: 24;
+    background: $surface;
+    border: solid $warning;
+    padding: 1 2;
+}
+
+ConfirmModal {
+    align: center middle;
+}
+
+.confirm-dialog {
+    width: 50;
+    height: 8;
+    background: $surface;
+    border: solid $error;
+    padding: 1 2;
+}
+
+/* Backchannel overlay */
+
+BackchannelOverlay {
+    align: center middle;
+    background: rgba(0,0,0,0.6);
+}
+
+.backchannel-dialog {
+    width: 90;
+    height: 40;
+    background: $surface;
+    border: solid $accent;
+}
+
+.backchannel-header {
+    height: 1;
+    background: $panel;
+    padding: 0 1;
+    color: $accent;
+    text-style: bold;
+}
+
+.backchannel-transcript {
+    height: 1fr;
+    overflow-y: scroll;
+    padding: 0 1;
+}
+
+.backchannel-input {
+    height: 4;
+    border-top: solid $panel;
+}
+
+/* Review modal */
+
+ReviewModal {
+    align: center middle;
+}
+
+.review-dialog {
+    width: 95%;
+    height: 85%;
+    background: $surface;
+    border: solid $success;
+}
+
+.review-files {
+    width: 25%;
+    height: 1fr;
+    border-right: solid $panel;
+    overflow-y: scroll;
+}
+
+.review-diff {
+    width: 75%;
+    height: 1fr;
+    overflow: scroll;
+    padding: 0 1;
+}
+
+.diff-add {
+    color: $success;
+}
+
+.diff-remove {
+    color: $error;
+}
+
+.diff-header {
+    color: $primary;
+    text-style: bold;
+}
+
+/* Help screen */
+
+HelpModal {
+    align: center middle;
+}
+
+.help-dialog {
+    width: 70;
+    height: 30;
+    background: $surface;
+    border: solid $primary;
+    padding: 1 2;
+    overflow-y: scroll;
+}
